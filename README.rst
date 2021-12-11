@@ -40,7 +40,10 @@ You can use this package to track the execution of a given method as follows:
             
     with Tracker(path):
         example_function()
-        
+    
+    # The last line of the footer is used to mark whether
+    # the execution was successfull or a crash happened 
+    # and the logger died.
     df = pd.read_csv(
         path,
         skipfooter=1,
