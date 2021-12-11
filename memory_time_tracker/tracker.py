@@ -10,7 +10,7 @@ from .get_used_ram import get_used_ram
 from .resources_logger import resources_logger
 
 
-class Tracker(object):
+class Tracker:
     def __init__(
         self,
         file_name: str,
