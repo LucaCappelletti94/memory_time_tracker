@@ -1,9 +1,11 @@
-import os
-import numpy as np
+"""Module providing the Tracker object."""
 import multiprocessing as mp
+import os
 from time import sleep, time
 from typing import List, Tuple
-from tqdm.auto import tqdm
+
+import numpy as np
+
 from .get_used_ram import get_used_ram
 from .resources_logger import resources_logger
 
@@ -112,7 +114,7 @@ class Tracker(object):
 
     def __enter__(self):
         self.stop.set()
-        self.process.daemon=True
+        self.process.daemon = True
         self.process.start()
         sleep(self.start_delay)
         self.stop.clear()
@@ -125,7 +127,7 @@ class Tracker(object):
 
         if exc_type is not None:
             if self.verbose:
-                print("The program had an exception %s"%str(exc_value))
+                print("The program had an exception %s" % str(exc_value))
             with open(self.file_name, "a") as f:
                 f.write("-1,-1\n")
 
