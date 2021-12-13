@@ -2,6 +2,8 @@
 def get_used_ram():
     """Return the ammout of ram used **BY THE SYSTEM**.
 
+    Note that the amount is returned in GB.
+
     The values are read from /proc/meminfo (LINUX ONLY) to be as close as precise
     as possible. Moreover, the ram used is computed by:
 
