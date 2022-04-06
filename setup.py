@@ -6,7 +6,7 @@ def readme():
 
 setup(
     name='memory_time_tracker',
-    version='0.0.2',
+    version='0.0.3',
     description='Python tool to track the memory and time requirements of software.',
     long_description=readme(),
     url='https://github.com/LucaCappelletti94/memory_time_tracker',
