@@ -16,6 +16,6 @@ setup(
     python_requires='>=3.6.0',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*', 'notebooks*']),
     install_requires=[
-        
+        "environments_utils"
     ],
 )

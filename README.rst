@@ -1,10 +1,12 @@
 Memory Time Tracker
 =================================
+|pip| |downloads|
+
 Python tool to track the memory and time requirements of software.
 
 Requirements
 ----------------------------
-Please do note that this package makes use of [proc/meminfo](https://man7.org/linux/man-pages/man5/proc.5.html),
+Please do note that this package makes use of `proc/meminfo <https://man7.org/linux/man-pages/man5/proc.5.html>`_,
 so it is strictly compatible only with Linux systems.
 
 As most tracker systems, this one works best if there is a limited amount of noise in the system.
@@ -12,11 +14,12 @@ Do not run other software while running the benchmark, or your results may be sk
 
 Installing package
 ----------------------------
-We will publish this package relatively soon on Pypi, but for the time being you can install this by running:
+As usual, to install this package from Pypi just run:
 
 .. code:: bash
 
-    pip install -e git+https://github.com/LucaCappelletti94/memory_time_tracker.git
+    pip install memory_time_tracker
+
 
 Usage example
 ---------------------------
@@ -49,3 +52,12 @@ You can use this package to track the execution of a given method as follows:
         skipfooter=1,
         engine="python"
     )
+
+
+.. |pip| image:: https://badge.fury.io/py/memory-time-tracker.svg
+    :target: https://badge.fury.io/py/memory-time-tracker
+    :alt: Pypi project
+
+.. |downloads| image:: https://pepy.tech/badge/memory-time-tracker
+    :target: https://pepy.tech/badge/memory-time-tracker
+    :alt: Pypi total project downloads 

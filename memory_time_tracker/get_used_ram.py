@@ -1,3 +1,5 @@
+"""Submodule providing methods to measure the current RAM usage."""
+
 
 def get_used_ram():
     """Return the ammout of ram used **BY THE SYSTEM**.

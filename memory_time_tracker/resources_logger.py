@@ -1,6 +1,7 @@
+"""Submodule providing method to store the resources to memory or disk according to speed."""
+
 from multiprocessing import Event
-from queue import Queue
-from time import sleep, time
+from time import sleep
 from timeit import default_timer as timer
 
 from .get_refresh_delay import get_refresh_delay

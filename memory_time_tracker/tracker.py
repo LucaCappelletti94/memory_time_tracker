@@ -4,7 +4,8 @@ import os
 from time import sleep, time
 from typing import List, Tuple
 
-import numpy as np
+from statistics import mean, stdev
+from environments_utils import is_linux
 
 from .get_used_ram import get_used_ram
 from .resources_logger import resources_logger
@@ -40,6 +41,13 @@ class Tracker:
         start_delay: int = 5,
             How much to wait before starting the tracker to let the process start.
         """
+
+        if not is_linux():
+            raise NotImplementedError(
+                "The current implementation of the Tracker exclusively "
+                "works on Linux systems."
+            )
+
         self.end_delay = end_delay
         self.verbose = verbose
         self.stop = mp.Event()
@@ -90,7 +98,7 @@ class Tracker:
                 For how many seconds the function will measure the ram used
         """
         measurements = self._measure_ram(number_of_seconds)
-        return np.mean(measurements), np.std(measurements)
+        return mean(measurements), stdev(measurements)
 
     def _calibrate(self, calibration_seconds: float) -> float:
         """Before letting python continue we take a couple of seconds to measure
