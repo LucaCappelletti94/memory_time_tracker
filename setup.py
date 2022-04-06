@@ -6,7 +6,7 @@ def readme():
 
 setup(
     name='memory_time_tracker',
-    version='0.0.4',
+    version='0.0.5',
     description='Python tool to track the memory and time requirements of software.',
     long_description=readme(),
     url='https://github.com/LucaCappelletti94/memory_time_tracker',
@@ -17,5 +17,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*', 'notebooks*']),
     install_requires=[
         "environments_utils",
+        "pandas",
+        "matplotlib"
     ],
 )

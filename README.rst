@@ -4,6 +4,8 @@ Memory Time Tracker
 
 Memory time tracker is a simple python tool to track the memory and time requirements of software across both very brief (milliseconds) and large (days) time and memory requirements through adaptative log resolution.
 
+The reports are CSV files with two columns, the first one with the time delta and the second one with the required RAM.
+
 Tracking upwards to crash
 ------------------------------------
 This package handles gracefully also use cases where the tracked software
@@ -43,41 +45,70 @@ You can use this package to track the execution of a given method as follows:
 
 .. code:: python
 
-    from memory_time_tracker import Tracker, has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully
+    from memory_time_tracker import Tracker, has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully, plot_reports
     from time import sleep
-    import pandas as pd
+    import numpy as np
 
     def example_function():
-        """Small example of function that takes 1 second."""
+        """Small example of function that takes 2 seconds."""
+        arrays = []
         for _ in range(10):
+            arrays.append(np.zeros((10000, 10000)))
+            sleep(0.2)
+
+    def example_function_which_crashes():
+        """Small example of function that takes 2 seconds and crashes."""
+        arrays = []
+        for _ in range(20):
+            arrays.append(np.zeros((10000, 5000)))
             sleep(0.1)
+        raise ValueError("Argh! I'm crashig!")
 
     # The path where we will store the log
-    path = "/tmp/tracker.csv"
+    path1 = "/tmp/tracker_example.csv"
+    # The path where we will store the log with the crash
+    path2 = "/tmp/tracker_example_with_crash.csv"
 
     # Create the tracker context
-    with Tracker(path):
+    with Tracker(path1):
         example_function()
 
-    print(
-        "Successful: ", has_completed_successfully(path),
-        "Crashed gracefully: ", has_crashed_gracefully(path),
-        "Crashed ungracefully: ", has_crashed_ungracefully(path)
-    )
-        
-    # We load in a pandas DataFrame the tracked performance.
-    df = pd.read_csv(
-        path,
-        # The last line of the footer is used to mark whether
-        # the execution was successful, or a crash happened 
-        # and the logger died.
-        skipfooter=1,
-        # The skip footer option is only available when the engine
-        # selected is Python
-        engine="python"
-    )
+    # Wait between tracking to allow for memory to free
+    sleep(20)
 
-You can see this example `as a Jupyter Notebook here <https://github.com/LucaCappelletti94/memory_time_tracker/blob/main/Tracker%20tutorial.ipynb>`_ and `run it on Colab here <https://colab.research.google.com/drive/17RhQQyP8gmIb1qprQwOVPwut_mZgA01K?usp=sharing>`_.
+    # Create the tracker context to handle crashable libraries
+    try:
+        with Tracker(path2, verbose=True):
+            example_function_which_crashes()
+    except Exception:
+        pass
+
+    print(
+        "Successful: ", has_completed_successfully(path1),
+        "Crashed gracefully: ", has_crashed_gracefully(path1),
+        "Crashed ungracefully: ", has_crashed_ungracefully(path1)
+    )
+    # Successful:  True Crashed gracefully:  False Crashed ungracefully:  False
+
+    print(
+        "Successful: ", has_completed_successfully(path2),
+        "Crashed gracefully: ", has_crashed_gracefully(path2),
+        "Crashed ungracefully: ", has_crashed_ungracefully(path2)
+    )
+    # Successful:  False Crashed gracefully:  True Crashed ungracefully:  False  
+
+    plot_reports([path1, path2])
+
+
+You can `run it on Colab here <https://colab.research.google.com/drive/17RhQQyP8gmIb1qprQwOVPwut_mZgA01K?usp=sharing>`_.
+
+The above example should generate a picture such as this one:
+
+.. image:: example.png
+  :width: 400
+  :alt: Alternative text
+
+Note that there is some noise in the RAM and time measurements as it was executed on COLAB.
 
 Authors and License
 ---------------------------
