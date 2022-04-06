@@ -12,7 +12,7 @@ This package handles gracefully also use cases where the tracked software
 dies because of OOM or generally crashes by adding a ``0,0`` as the last line of the CSV document
 it produces when the execution finishes nominally while adding a ``-1,-1`` when the execution
 finishes with a detectable exception. When there are crashes not detectable through exceptions,
-such as machine freezes because of OOM, kernel panics or other things, neither ``0,0``nor ``1,1`` are (inevitably) written at the end of the CSV.
+such as machine freezes because of OOM, kernel panics or other things, neither ``0,0`` nor ``1,1`` are (inevitably) written at the end of the CSV.
 
 To help distinguish the different possible completion statuses, we have prepared three methods:
 
