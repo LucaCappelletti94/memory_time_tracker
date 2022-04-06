@@ -79,7 +79,7 @@ You can use this package to track the execution of a given method as follows:
 
 You can see this example `as a Jupyter Notebook here <https://github.com/LucaCappelletti94/memory_time_tracker/blob/main/Tracker%20tutorial.ipynb>`_ and `run it on Colab here <https://colab.research.google.com/drive/17RhQQyP8gmIb1qprQwOVPwut_mZgA01K?usp=sharing>`_.
 
-Authors and Licence
+Authors and License
 ---------------------------
 This package was developed by `Luca Cappelletti <https://github.com/LucaCappelletti94>`_ and `Tommaso Fontana <https://github.com/zommiommy>`_ and is released under `MIT License <https://github.com/LucaCappelletti94/memory_time_tracker/blob/main/LICENSE>`_.
 
