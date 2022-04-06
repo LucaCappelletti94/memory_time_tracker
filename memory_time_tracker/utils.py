@@ -2,14 +2,14 @@
 import os
 
 
-def get_last_line(path: str, number_of_lines_to_read: int = 1) -> str:
+def get_last_line(path: str, number_of_lines_to_read: int = 2) -> str:
     """Return the last line of file at given path.
 
     Parameters
     ------------------------
     path: str
         The path from where to load the document.
-    number_of_lines_to_read: int = 1
+    number_of_lines_to_read: int = 2
         Number of lines to read. By defauly, one.
 
     Implementation details
@@ -36,7 +36,7 @@ def get_last_line(path: str, number_of_lines_to_read: int = 1) -> str:
             # count how many '\n' you have in your string:
             # if you have 1, you are in the last line; if you have 2, you have the two last lines
             if last_line.count('\n') == number_of_lines_to_read:
-                return last_line
+                return last_line.strip("\n")
 
 
 def has_completed_successfully(path: str) -> bool:
