@@ -58,7 +58,7 @@ def has_completed_successfully(path: str) -> bool:
                 path=path
             )
         )
-    return get_last_line() == "0,0"
+    return get_last_line(path) == "0,0"
 
 
 def has_crashed_gracefully(path: str) -> bool:
@@ -84,7 +84,7 @@ def has_crashed_gracefully(path: str) -> bool:
                 path=path
             )
         )
-    return get_last_line() == "-1,-1"
+    return get_last_line(path) == "-1,-1"
 
 
 def has_crashed_ungracefully(path: str) -> bool:
@@ -108,4 +108,4 @@ def has_crashed_ungracefully(path: str) -> bool:
                 path=path
             )
         )
-    return get_last_line() not in ("-1,-1", "0,0")
+    return get_last_line(path) not in ("-1,-1", "0,0")
