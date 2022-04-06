@@ -4,6 +4,23 @@ Memory Time Tracker
 
 Python tool to track the memory and time requirements of software.
 
+Tracking upwards to crash
+------------------------------------
+This package handles gracefully also use cases where the tracked software
+dies because of OOM or generally crash by adding a `0,0` as the last line of the CSV document
+it produces when the execution finishes nominally, while adding a `-1,-1` when the execution
+finishes with a detectable exception. When there are crashes not detectable throgh exceptions,
+such as machine freezes because of OOM, kernel panics or other things, neither `0,0` or `1,1`
+are (inevitably) written at the end of the CSV.
+
+To help distinguish the different possible completion status, we have prepared three methods:
+
+* `has_completed_successfully` to detect whether the execution has completed without hickups.
+* `has_crashed_gracefully` to detect crashes that raised "normal" exceptions.
+* `has_crashed_ungracefully` to detect crashes that did not raise "normal" exceptions, such as OOM and core dumps.
+
+See more below in the examples section.
+
 Requirements
 ----------------------------
 Please do note that this package makes use of `proc/meminfo <https://man7.org/linux/man-pages/man5/proc.5.html>`_,
@@ -27,31 +44,46 @@ You can use this package to track the execution of a given method as follows:
 
 .. code:: python
 
-    from memory_time_tracker import Tracker
+    from memory_time_tracker import Tracker, has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully
     from time import sleep
-    from tqdm.auto import trange
-    import numpy as np
     import pandas as pd
 
     def example_function():
-        arrays = []
-        for i in trange(10, desc="Running test"):
+        """Small example of function that takes 1 second."""
+        for _ in range(10):
             sleep(0.1)
-            arrays.append(np.zeros((10000, 1000)))
 
-    path = "/tmp/tracker.log"
-            
+    # The path where we will store the log
+    path = "/tmp/tracker.csv"
+
+    # Create the tracker context
     with Tracker(path):
         example_function()
-    
-    # The last line of the footer is used to mark whether
-    # the execution was successfull or a crash happened 
-    # and the logger died.
+
+    print(
+        "Successful: ", has_completed_successfully(path),
+        "Crashed gracefully: ", has_crashed_gracefully(path),
+        "Crashed ungracefully: ", has_crashed_ungracefully(path)
+    )
+        
+    # We load in a pandas DataFrame the tracked performance.
     df = pd.read_csv(
         path,
+        # The last line of the footer is used to mark whether
+        # the execution was successfull or a crash happened 
+        # and the logger died.
         skipfooter=1,
+        # The skipfooter option is only available when the engine
+        # selected is Python
         engine="python"
     )
+
+You can see this example `as a Jupyter Notebook here <https://github.com/LucaCappelletti94/memory_time_tracker/blob/main/Tracker%20tutorial.ipynb>`_ and `run it on Colab here <https://colab.research.google.com/drive/17RhQQyP8gmIb1qprQwOVPwut_mZgA01K?usp=sharing>`_.
+
+Future work
+---------------------------
+Since we have already developed a pipeline to draw performance diagrams comparing different 
+libraries, we may integrate it within this library as it seems quite relevant.
 
 
 .. |pip| image:: https://badge.fury.io/py/memory-time-tracker.svg
