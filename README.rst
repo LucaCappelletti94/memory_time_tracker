@@ -114,11 +114,6 @@ Authors and License
 ---------------------------
 This package was developed by `Luca Cappelletti <https://github.com/LucaCappelletti94>`_ and `Tommaso Fontana <https://github.com/zommiommy>`_ and is released under `MIT License <https://github.com/LucaCappelletti94/memory_time_tracker/blob/main/LICENSE>`_.
 
-Future work
----------------------------
-Since we have already developed a pipeline to draw performance diagrams comparing different 
-libraries, we may integrate it within this library as it seems quite relevant.
-
 
 .. |pip| image:: https://badge.fury.io/py/memory-time-tracker.svg
     :target: https://badge.fury.io/py/memory-time-tracker
