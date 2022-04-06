@@ -7,17 +7,17 @@ Python tool to track the memory and time requirements of software.
 Tracking upwards to crash
 ------------------------------------
 This package handles gracefully also use cases where the tracked software
-dies because of OOM or generally crash by adding a `0,0` as the last line of the CSV document
-it produces when the execution finishes nominally, while adding a `-1,-1` when the execution
+dies because of OOM or generally crash by adding a ``0,0`` as the last line of the CSV document
+it produces when the execution finishes nominally, while adding a ``-1,-1`` when the execution
 finishes with a detectable exception. When there are crashes not detectable throgh exceptions,
-such as machine freezes because of OOM, kernel panics or other things, neither `0,0` or `1,1`
+such as machine freezes because of OOM, kernel panics or other things, neither ``0,0`` or ``1,1``
 are (inevitably) written at the end of the CSV.
 
 To help distinguish the different possible completion status, we have prepared three methods:
 
-* `has_completed_successfully` to detect whether the execution has completed without hickups.
-* `has_crashed_gracefully` to detect crashes that raised "normal" exceptions.
-* `has_crashed_ungracefully` to detect crashes that did not raise "normal" exceptions, such as OOM and core dumps.
+* ``has_completed_successfully`` to detect whether the execution has completed without hickups.
+* ``has_crashed_gracefully`` to detect crashes that raised "normal" exceptions.
+* ``has_crashed_ungracefully`` to detect crashes that did not raise "normal" exceptions, such as OOM and core dumps.
 
 See more below in the examples section.
 
