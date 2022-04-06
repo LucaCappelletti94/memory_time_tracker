@@ -13,11 +13,11 @@ def resources_logger(stop: Event, path: str, calibration_offset: int = 0):
 
     Parameters
     ----------
-    stop: mp.Event,
+    stop: mp.Event
         The stop signal that must be set to stop the ram logging.
-    path: str,
+    path: str
         The path of the csv where to log the data.
-    calibration_offset: int = 0,
+    calibration_offset: int = 0
         The optional system offsets to remove from the data that will be logged.
     """
     while stop.is_set():

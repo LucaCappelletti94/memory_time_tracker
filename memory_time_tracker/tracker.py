@@ -1,10 +1,10 @@
 """Module providing the Tracker object."""
 import multiprocessing as mp
 import os
+from statistics import mean, stdev
 from time import sleep, time
 from typing import List, Tuple
 
-from statistics import mean, stdev
 from environments_utils import is_linux
 
 from .get_used_ram import get_used_ram
@@ -25,20 +25,20 @@ class Tracker:
 
         Parameters
         ----------
-        file_name: str,
+        file_name: str
             The csv file where the ram measurements will be logged.
-        end_delay: float = 4,
+        end_delay: float = 4
             How much time the context manager will wait before exiting once
             the snipped has ended. This is used to measure the final ammount
             of ram used.
-        calibrate: bool = True,
+        calibrate: bool = True
             If the context manager should do a calibration measurement before
             starting the code.
-        calibration_seconds: float = 2,
+        calibration_seconds: float = 2
             How much time, in seconds, the calibration step will take.
-        verbose: bool = False,
+        verbose: bool = False
             If the program should be verbose and print info or not.
-        start_delay: int = 5,
+        start_delay: int = 5
             How much to wait before starting the tracker to let the process start.
         """
 
@@ -79,8 +79,8 @@ class Tracker:
 
         Parameters
         ----------
-            number_of_seconds: float,
-                For how many seconds the function will measure the ram used
+        number_of_seconds: float
+            For how many seconds the function will measure the ram used
         """
         measurements = []
         start = time()
@@ -94,8 +94,8 @@ class Tracker:
 
         Parameters
         ----------
-            number_of_seconds: float,
-                For how many seconds the function will measure the ram used
+        number_of_seconds: float
+            For how many seconds the function will measure the ram used
         """
         measurements = self._measure_ram(number_of_seconds)
         return mean(measurements), stdev(measurements)
@@ -108,8 +108,8 @@ class Tracker:
 
         Parameters
         ----------
-            number_of_seconds: float,
-                For how many seconds the function will measure the ram used
+        number_of_seconds: float
+            For how many seconds the function will measure the ram used
         """
         if self.verbose:
             print("Starting calibration")
