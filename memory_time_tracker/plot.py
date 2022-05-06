@@ -142,6 +142,7 @@ def plot_reports(
     fig, axis = plt.subplots(figsize=(5, 5), dpi=200)
     axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
     axis.yaxis.set_major_formatter(plt.FuncFormatter(yformat_func))
+    axis.grid(True, which="both", ls="-", alpha=0.3)
 
     # Handle scales and the relative axis labels.
     if use_log_scale_for_time:
@@ -221,17 +222,28 @@ def plot_reports(
 
         if reduce == "max":
             aggregated_report = reports.groupby(reports.index).max()
+        
         aggregated_report.sort_values("delta", inplace=True)
         aggregated_time, aggregated_memory = aggregated_report.values.T
+
         if apply_savgol_filter:
             aggregated_memory = filter_signal(
                 aggregated_memory,
                 window=savgol_filter_window_size
             )
-        _, std_memory = reports.groupby(
-            reports.index).std().loc[aggregated_report.index].to_numpy().T
+        
 
         if show_memory_std:
+            _, std_memory = reports.groupby(
+                reports.index
+            ).std().loc[aggregated_report.index].to_numpy().T
+
+            if apply_savgol_filter:
+                std_memory = filter_signal(
+                    std_memory,
+                    window=savgol_filter_window_size
+                )
+            
             axis.fill_between(
                 aggregated_time,
                 aggregated_memory-std_memory,
