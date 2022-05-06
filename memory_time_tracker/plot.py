@@ -277,3 +277,5 @@ def plot_reports(
     fig.legend(
         prop={'size': 8}
     )
+    
+    fig.tight_layout()
