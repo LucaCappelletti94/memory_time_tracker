@@ -333,7 +333,11 @@ def plot_reports(
     """
 
     if show_linear_and_log_scale:
-        figure, linear_axis, log_axis = plt.subplots(figsize=(10, 5), dpi=200)
+        figure, (linear_axis, log_axis) = plt.subplots(
+            ncols=2,
+            figsize=(10, 5),
+            dpi=200
+        )
         for axis, scale in (
             (linear_axis, False),
             (log_axis, True),
@@ -352,6 +356,7 @@ def plot_reports(
                 aggregated_line_line_width=aggregated_line_line_width,
             )
     else:
+        figure, axis = plt.subplots(figsize=(1, 5), dpi=200)
         _plot_reports(
             figure,
             axis=axis,
