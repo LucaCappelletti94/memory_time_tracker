@@ -147,7 +147,7 @@ def plot_reports(
                 ])
         
         reports = pd.concat(reports)
-        mean_report = reports.groupby(reports.index).mean()
+        mean_report = reports.groupby(reports.index).max()
         mean_report.sort_values("delta", inplace=True)
         mean_time, mean_memory = mean_report.values.T
         _, std_memory = reports.groupby(reports.index).std().loc[mean_report.index].to_numpy().T
@@ -177,7 +177,7 @@ def plot_reports(
         axis.plot(
             mean_time,
             mean_memory,
-            linewidth=2,
+            linewidth=1,
             color=color,
             label=report_name,
         )
