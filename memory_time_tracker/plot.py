@@ -180,4 +180,6 @@ def plot_reports(
             label=report_name,
         )
 
-    fig.legend()
+    fig.legend(
+        prop={'size': 8}
+    )
