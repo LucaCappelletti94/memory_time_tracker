@@ -6,6 +6,7 @@ import matplotlib.patheffects as PathEffects
 import humanize
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.signal import savgol_filter
 from .utils import has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully
 
 TABLEAU = [
@@ -20,6 +21,7 @@ TABLEAU = [
     "tab:olive",
     "tab:cyan",
 ]
+
 
 def xformat_func(value, tick_number):
     """Return time value formatted in human readable."""
@@ -46,27 +48,82 @@ def yformat_func(value, tick_number):
     return humanize.naturalsize(value * (1000**3))
 
 
+def filter_signal(
+    y: List[float],
+    window: int = 17,
+    polyorder: int = 3
+) -> List[float]:
+    """Return filtered signal using savgol filter.
+
+    Parameters
+    ----------------------------------
+    y: List[float]
+        The vector to filter.
+    window: int = 17
+        The size of the window.
+        This value MUST be an odd number.
+    polyorder: int = 3
+        Order of the polynomial.
+
+    Returns
+    ----------------------------------
+    Filtered vector.
+    """
+    # The window cannot be smaller than 7 and cannot be greater
+    # than the length of the given vector.
+    window = max(7, min(window, len(y)))
+    # If the window is not odd we force it to be so.
+    if window % 2 == 0:
+        window -= 1
+    # If the window is still bigger than the size of the given vector
+    # we return the vector unfiltered.
+    if len(y) < window:
+        return y
+    # Otherwise we apply the savgol filter.
+    return savgol_filter(y, window, polyorder)
+
+
 def plot_reports(
     paths: Union[str, List[str]],
+    reduce: str = "max",
     use_log_scale_for_time: bool = True,
     use_log_scale_for_memory: bool = False,
-    plot_single_report_lines: bool = True
+    plot_single_report_lines: bool = True,
+    show_memory_std: bool = False,
+    apply_savgol_filter: bool = True
 ):
     """Plot one or more reports from the provided path(s).
 
     Parameters
     ------------------------
     paths: Union[str, List[str]]
-        Path(s) from where to load the reports
+        Path(s) from where to load the reports.
+        File with the same basename will be averaged out.
+    reduce: str = "max"
+        How to reduce the values between the different executions.
     use_log_scale_for_time: bool = True
         Whether to use log scale for the horizontal axis.
     use_log_scale_for_memory: bool = False
         Whether to use log scale for the vertical axis.
     plot_single_report_lines: bool = True
         Whether to plot the single report lines.
+    show_memory_std: bool = False
+        Whether to show standard deviation.
+    apply_savgol_filter: bool = True
+        On long running benchmarks, expecially when using
+        multiple holdouts, there may be a significant amount
+        of noise. In these cases, a savgol filter may
+        increase significantly how understandable the plot will be.
     """
     if isinstance(paths, str):
         paths = [paths]
+
+    if reduce != "max":
+        raise ValueError(
+            "So far we only support the reduction using max. "
+            "Would you like another reduce? Open an issue or a pull request "
+            "on the memory time tracker repository."
+        )
 
     fig, axis = plt.subplots(figsize=(5, 5), dpi=200)
     axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
@@ -145,39 +202,45 @@ def plot_reports(
                         alpha=0.9
                     )
                 ])
-        
+
         reports = pd.concat(reports)
-        mean_report = reports.groupby(reports.index).max()
+
+        if reduce == "max":
+            mean_report = reports.groupby(reports.index).max()
         mean_report.sort_values("delta", inplace=True)
         mean_time, mean_memory = mean_report.values.T
-        _, std_memory = reports.groupby(reports.index).std().loc[mean_report.index].to_numpy().T
+        if apply_savgol_filter:
+            mean_memory = filter_signal(mean_memory)
+        _, std_memory = reports.groupby(
+            reports.index).std().loc[mean_report.index].to_numpy().T
 
-        axis.fill_between(
-            mean_time,
-            mean_memory-std_memory,
-            mean_memory+std_memory,
-            color=color,
-            alpha=0.1
-        )
-        axis.plot(
-            mean_time,
-            mean_memory-std_memory,
-            color=color,
-            linewidth=0.5,
-            alpha=0.1
-        )
-        axis.plot(
-            mean_time,
-            mean_memory+std_memory,
-            color=color,
-            linewidth=0.5,
-            alpha=0.1
-        )
+        if show_memory_std:
+            axis.fill_between(
+                mean_time,
+                mean_memory-std_memory,
+                mean_memory+std_memory,
+                color=color,
+                alpha=0.1
+            )
+            axis.plot(
+                mean_time,
+                mean_memory-std_memory,
+                color=color,
+                linewidth=0.5,
+                alpha=0.1
+            )
+            axis.plot(
+                mean_time,
+                mean_memory+std_memory,
+                color=color,
+                linewidth=0.5,
+                alpha=0.1
+            )
 
         axis.plot(
             mean_time,
             mean_memory,
-            linewidth=1,
+            linewidth=2,
             color=color,
             label=report_name,
         )
