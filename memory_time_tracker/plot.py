@@ -25,6 +25,28 @@ TABLEAU = [
 ]
 
 
+def remove_duplicated_legend_labels(
+    axes: Axes,
+    legend_position: str,
+):
+    """Remove duplicated labels from the plot legend.
+
+    Parameters
+    ---------------
+    axes: Axes
+        Axes where to show the labels.
+    legend_position: str
+        Legend position.
+    """
+    handles, labels = axes.get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    axes.legend(
+        by_label.values(),
+        sanitize_ml_labels(by_label.keys()),
+        loc=legend_position
+    )
+
+
 def xformat_func(value, tick_number):
     """Return time value formatted in human readable."""
     if value == 0:
@@ -147,10 +169,6 @@ def _plot_reports(
         else:
             aggregated_line_line_width = 1
 
-    axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
-    axis.yaxis.set_major_formatter(plt.FuncFormatter(yformat_func))
-    axis.grid(True, which="both", ls="-", alpha=0.3)
-
     # Handle scales and the relative axis labels.
     if use_log_scale_for_time:
         axis.set_xscale("log")
@@ -163,6 +181,10 @@ def _plot_reports(
         axis.set_xlabel("Memory (log scale)")
     else:
         axis.set_ylabel("Memory")
+
+    axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
+    axis.yaxis.set_major_formatter(plt.FuncFormatter(yformat_func))
+    axis.grid(True, which="both", ls="-", alpha=0.3)
 
     # We group paths by base name so we can plot
     # the standard deviation as an area of the graph.
@@ -229,7 +251,7 @@ def _plot_reports(
 
         if reduce == "max":
             aggregated_report = reports.groupby(reports.index).max()
-        
+
         aggregated_report.sort_values("delta", inplace=True)
         aggregated_time, aggregated_memory = aggregated_report.values.T
 
@@ -238,7 +260,6 @@ def _plot_reports(
                 aggregated_memory,
                 window=savgol_filter_window_size
             )
-        
 
         if show_memory_std:
             _, std_memory = reports.groupby(
@@ -250,7 +271,7 @@ def _plot_reports(
                     std_memory,
                     window=savgol_filter_window_size
                 )
-            
+
             axis.fill_between(
                 aggregated_time,
                 aggregated_memory-std_memory,
@@ -355,6 +376,11 @@ def plot_reports(
                 savgol_filter_window_size=savgol_filter_window_size,
                 aggregated_line_line_width=aggregated_line_line_width,
             )
+
+            remove_duplicated_legend_labels(
+                axis,
+                "best",
+            )
     else:
         figure, axis = plt.subplots(figsize=(1, 5), dpi=200)
         _plot_reports(
@@ -369,6 +395,11 @@ def plot_reports(
             apply_savgol_filter=apply_savgol_filter,
             savgol_filter_window_size=savgol_filter_window_size,
             aggregated_line_line_width=aggregated_line_line_width,
+        )
+
+        remove_duplicated_legend_labels(
+            axis,
+            "best",
         )
 
     figure.tight_layout()
