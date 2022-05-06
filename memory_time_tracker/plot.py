@@ -43,7 +43,8 @@ def remove_duplicated_legend_labels(
     axes.legend(
         by_label.values(),
         sanitize_ml_labels(by_label.keys()),
-        loc=legend_position
+        loc=legend_position,
+        prop={'size': 8}
     )
 
 
@@ -301,11 +302,6 @@ def _plot_reports(
             color=color,
             label=report_name,
         )
-
-    figure.legend(
-        prop={'size': 8}
-    )
-
 
 def plot_reports(
     paths: Union[str, List[str]],
