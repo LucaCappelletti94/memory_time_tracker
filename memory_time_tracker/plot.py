@@ -175,7 +175,7 @@ def plot_reports(
         axis.plot(
             mean_time,
             mean_memory,
-            limean_memorynewidth=2,
+            linewidth=2,
             color=color,
         )
 
