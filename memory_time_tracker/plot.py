@@ -8,8 +8,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from .utils import has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully
 
+TABLEAU = [
+    "tab:blue",
+    "tab:orange",
+    "tab:green",
+    "tab:red",
+    "tab:purple",
+    "tab:brown",
+    "tab:pink",
+    "tab:gray",
+    "tab:olive",
+    "tab:cyan",
+]
 
 def xformat_func(value, tick_number):
+    """Return time value formatted in human readable."""
     if value == 0:
         return "0s"
     if value < 1e-9:
@@ -29,62 +42,141 @@ def xformat_func(value, tick_number):
 
 
 def yformat_func(value, tick_number):
+    """Return memory value formatted in human readable."""
     return humanize.naturalsize(value * (1000**3))
 
 
-def plot_reports(paths: Union[str, List[str]]):
+def plot_reports(
+    paths: Union[str, List[str]],
+    use_log_xscale: bool = True,
+    use_log_yscale: bool = True,
+    plot_single_report_lines: bool = True
+):
     """Plot one or more reports from the provided path(s).
 
     Parameters
     ------------------------
     paths: Union[str, List[str]]
         Path(s) from where to load the reports
+    use_log_xscale: bool = True
+        Whether to use log scale for the horizontal axis.
+    use_log_yscale: bool = True
+        Whether to use log scale for the vertical axis.
+    plot_single_report_lines: bool = True
+        Whether to plot the single report lines.
     """
     if isinstance(paths, str):
         paths = [paths]
 
     fig, axis = plt.subplots(figsize=(5, 5), dpi=200)
-    axis.set_xlabel("Time")
-    axis.set_ylabel("Memory")
     axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
     axis.yaxis.set_major_formatter(plt.FuncFormatter(yformat_func))
 
-    for path in paths:
-        # Get the name of the report
+    # Handle scales and the relative axis labels.
+    if use_log_xscale:
+        axis.set_xscale("log")
+        axis.set_xlabel("Time (log scale)")
+    else:
+        axis.set_xlabel("Time")
+
+    if use_log_yscale:
+        axis.set_yscale("log")
+        axis.set_xlabel("Memory (log scale)")
+    else:
+        axis.set_ylabel("Memory")
+
+    # We group paths by base name so we can plot
+    # the standard deviation as an area of the graph.
+    grouped_paths = pd.DataFrame([
+        {
+            "path": path,
+            "basename": os.path.basename(path)
+        }
+        for path in paths
+    ]).groupby("basename")
+
+    # We start to iterate on the groups
+    for (basename, group), color in zip(grouped_paths, TABLEAU):
         report_name = sanitize_ml_labels(
-            ".".join(os.path.basename(path).split(".")[:-1])
+            ".".join(basename.split(".")[:-1])
         )
-        # We load in a pandas DataFrame the tracked performance.
-        df = pd.read_csv(
-            path,
-            engine="c"
-        )
-        # We drop the last line
-        if has_completed_successfully(path):
-            df = df[:-1]
-        if has_crashed_gracefully(path):
-            df = df[:-2]
-        # Plot the current report line
-        segments = axis.plot(*df.values.T, label=report_name)[0]
-        # Show the skulls
-        if has_crashed_gracefully(path) or has_crashed_ungracefully(path):
-            x, y = df.iloc[-1].values
-            txt = axis.text(
-                x,
-                y,
-                "x",
-                c=segments.get_color(),
-                fontsize=12
-            )
-            txt.set_path_effects([
-                PathEffects.withStroke(
-                    linewidth=3,
-                    foreground=segments.get_color(),
-                ),
-                PathEffects.withStroke(
-                    linewidth=2,
-                    foreground='w',
-                    alpha=0.9
+        reports = []
+        # We iterate over the report paths
+        for path in group.path:
+            # We load in a pandas DataFrame the tracked performance.
+            report = pd.read_csv(path)
+
+            # We drop the last line if it has completed successfully
+            if has_completed_successfully(path):
+                report = report[:-1]
+
+            # And the last two lines if it has crashed gracefully
+            if has_crashed_gracefully(path):
+                report = report[:-2]
+
+            # We add this report to the list of reports to compute
+            # the standard deviation and mean.
+            reports.append(report)
+
+            if not plot_single_report_lines:
+                continue
+
+            # Plot the current report line
+            axis.plot(*report.values.T, label=report_name, color=color)
+
+            # Show the skulls
+            if has_crashed_gracefully(path) or has_crashed_ungracefully(path):
+                x, y = report.iloc[-1].values
+                txt = axis.text(
+                    x,
+                    y,
+                    "x",
+                    c=color,
+                    fontsize=12
                 )
-            ])
+                txt.set_path_effects([
+                    PathEffects.withStroke(
+                        linewidth=3,
+                        foreground=color,
+                    ),
+                    PathEffects.withStroke(
+                        linewidth=2,
+                        foreground='w',
+                        alpha=0.9
+                    )
+                ])
+        
+        reports = pd.concat(reports)
+        mean_time, mean_memory = reports.groupby(reports.index).mean().values.T
+        _, std_memory = reports.groupby(reports.index).std().values.T
+
+        axis.fill_between(
+            mean_time,
+            mean_memory-std_memory,
+            mean_memory+std_memory,
+            color=color,
+            alpha=0.1
+        )
+        axis.plot(
+            mean_time,
+            mean_memory-std_memory,
+            color=color,
+            linewidth=0.5,
+            alpha=0.1
+        )
+        axis.plot(
+            mean_time,
+            mean_memory+std_memory,
+            color=color,
+            linewidth=0.5,
+            alpha=0.1
+        )
+
+        axis.plot(
+            mean_time,
+            mean_memory,
+            limean_memorynewidth=2,
+            color=color,
+        )
+
     fig.legend()
