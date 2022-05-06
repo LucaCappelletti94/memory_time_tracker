@@ -147,8 +147,10 @@ def plot_reports(
                 ])
         
         reports = pd.concat(reports)
-        mean_time, mean_memory = reports.groupby(reports.index).mean().values.T
-        _, std_memory = reports.groupby(reports.index).std().values.T
+        mean_report = reports.groupby(reports.index).mean()
+        mean_report.sort_values("delta", inplace=True)
+        mean_time, mean_memory = mean_report.values.T
+        _, std_memory = reports.groupby(reports.index).std().loc[mean_report.index].to_numpy().T
 
         axis.fill_between(
             mean_time,
