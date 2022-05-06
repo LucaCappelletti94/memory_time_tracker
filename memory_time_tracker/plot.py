@@ -90,7 +90,9 @@ def plot_reports(
     use_log_scale_for_memory: bool = False,
     plot_single_report_lines: bool = True,
     show_memory_std: bool = False,
-    apply_savgol_filter: bool = True
+    apply_savgol_filter: bool = True,
+    savgol_filter_window_size: int = 33,
+    aggregated_line_line_width: Union[int, str] = "auto"
 ):
     """Plot one or more reports from the provided path(s).
 
@@ -114,6 +116,12 @@ def plot_reports(
         multiple holdouts, there may be a significant amount
         of noise. In these cases, a savgol filter may
         increase significantly how understandable the plot will be.
+    savgol_filter_window_size: int = 33
+        Size of the window to use for the savgol filter.
+    aggregated_line_line_width: Union[int, str] = "auto"
+        The linewidth to use to plot the aggregated line.
+        By default, with the value "auto", with set it to 1
+        when the single reports should not be shown and 2 otherwise.
     """
     if isinstance(paths, str):
         paths = [paths]
@@ -124,6 +132,12 @@ def plot_reports(
             "Would you like another reduce? Open an issue or a pull request "
             "on the memory time tracker repository."
         )
+
+    if aggregated_line_line_width == "auto":
+        if plot_single_report_lines:
+            aggregated_line_line_width = 2
+        else:
+            aggregated_line_line_width = 1
 
     fig, axis = plt.subplots(figsize=(5, 5), dpi=200)
     axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
@@ -206,41 +220,44 @@ def plot_reports(
         reports = pd.concat(reports)
 
         if reduce == "max":
-            mean_report = reports.groupby(reports.index).max()
-        mean_report.sort_values("delta", inplace=True)
-        mean_time, mean_memory = mean_report.values.T
+            aggregated_report = reports.groupby(reports.index).max()
+        aggregated_report.sort_values("delta", inplace=True)
+        aggregated_time, aggregated_memory = aggregated_report.values.T
         if apply_savgol_filter:
-            mean_memory = filter_signal(mean_memory)
+            aggregated_memory = filter_signal(
+                aggregated_memory,
+                window=savgol_filter_window_size
+            )
         _, std_memory = reports.groupby(
-            reports.index).std().loc[mean_report.index].to_numpy().T
+            reports.index).std().loc[aggregated_report.index].to_numpy().T
 
         if show_memory_std:
             axis.fill_between(
-                mean_time,
-                mean_memory-std_memory,
-                mean_memory+std_memory,
+                aggregated_time,
+                aggregated_memory-std_memory,
+                aggregated_memory+std_memory,
                 color=color,
                 alpha=0.1
             )
             axis.plot(
-                mean_time,
-                mean_memory-std_memory,
+                aggregated_time,
+                aggregated_memory-std_memory,
                 color=color,
                 linewidth=0.5,
                 alpha=0.1
             )
             axis.plot(
-                mean_time,
-                mean_memory+std_memory,
+                aggregated_time,
+                aggregated_memory+std_memory,
                 color=color,
                 linewidth=0.5,
                 alpha=0.1
             )
 
         axis.plot(
-            mean_time,
-            mean_memory,
-            linewidth=2,
+            aggregated_time,
+            aggregated_memory,
+            linewidth=aggregated_line_line_width,
             color=color,
             label=report_name,
         )
