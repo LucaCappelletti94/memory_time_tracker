@@ -6,6 +6,8 @@ import matplotlib.patheffects as PathEffects
 import humanize
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
 from scipy.signal import savgol_filter
 from .utils import has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully
 
@@ -83,7 +85,9 @@ def filter_signal(
     return savgol_filter(y, window, polyorder)
 
 
-def plot_reports(
+def _plot_reports(
+    figure: Figure,
+    axis: Axes,
     paths: Union[str, List[str]],
     reduce: str = "max",
     use_log_scale_for_time: bool = True,
@@ -98,6 +102,10 @@ def plot_reports(
 
     Parameters
     ------------------------
+    figure: Figure
+        The figure to plot on.
+    axis: Axes
+        The axis to plot on.
     paths: Union[str, List[str]]
         Path(s) from where to load the reports.
         File with the same basename will be averaged out.
@@ -139,7 +147,6 @@ def plot_reports(
         else:
             aggregated_line_line_width = 1
 
-    fig, axis = plt.subplots(figsize=(5, 5), dpi=200)
     axis.xaxis.set_major_formatter(plt.FuncFormatter(xformat_func))
     axis.yaxis.set_major_formatter(plt.FuncFormatter(yformat_func))
     axis.grid(True, which="both", ls="-", alpha=0.3)
@@ -274,8 +281,89 @@ def plot_reports(
             label=report_name,
         )
 
-    fig.legend(
+    figure.legend(
         prop={'size': 8}
     )
-    
-    fig.tight_layout()
+
+
+def plot_reports(
+    paths: Union[str, List[str]],
+    reduce: str = "max",
+    use_log_scale_for_time: bool = True,
+    use_log_scale_for_memory: bool = False,
+    plot_single_report_lines: bool = True,
+    show_memory_std: bool = False,
+    apply_savgol_filter: bool = True,
+    savgol_filter_window_size: int = 33,
+    aggregated_line_line_width: Union[int, str] = "auto",
+    show_linear_and_log_scale: bool = True
+):
+    """Plot one or more reports from the provided path(s).
+
+    Parameters
+    ------------------------
+    paths: Union[str, List[str]]
+        Path(s) from where to load the reports.
+        File with the same basename will be averaged out.
+    reduce: str = "max"
+        How to reduce the values between the different executions.
+    use_log_scale_for_time: bool = True
+        Whether to use log scale for the horizontal axis.
+    use_log_scale_for_memory: bool = False
+        Whether to use log scale for the vertical axis.
+    plot_single_report_lines: bool = True
+        Whether to plot the single report lines.
+    show_memory_std: bool = False
+        Whether to show standard deviation.
+    apply_savgol_filter: bool = True
+        On long running benchmarks, expecially when using
+        multiple holdouts, there may be a significant amount
+        of noise. In these cases, a savgol filter may
+        increase significantly how understandable the plot will be.
+    savgol_filter_window_size: int = 33
+        Size of the window to use for the savgol filter.
+    aggregated_line_line_width: Union[int, str] = "auto"
+        The linewidth to use to plot the aggregated line.
+        By default, with the value "auto", with set it to 1
+        when the single reports should not be shown and 2 otherwise.
+    show_linear_and_log_scale: bool = True
+        Whether to make one plot with the parameters or two
+        using both a linear and logaritmic scal
+        for the horizontal (the time) axis
+    """
+
+    if show_linear_and_log_scale:
+        figure, linear_axis, log_axis = plt.subplots(figsize=(10, 5), dpi=200)
+        for axis, scale in (
+            (linear_axis, False),
+            (log_axis, True),
+        ):
+            _plot_reports(
+                figure,
+                axis=axis,
+                paths=paths,
+                reduce=reduce,
+                use_log_scale_for_time=scale,
+                use_log_scale_for_memory=use_log_scale_for_memory,
+                plot_single_report_lines=plot_single_report_lines,
+                show_memory_std=show_memory_std,
+                apply_savgol_filter=apply_savgol_filter,
+                savgol_filter_window_size=savgol_filter_window_size,
+                aggregated_line_line_width=aggregated_line_line_width,
+            )
+    else:
+        _plot_reports(
+            figure,
+            axis=axis,
+            paths=paths,
+            reduce=reduce,
+            use_log_scale_for_time=use_log_scale_for_time,
+            use_log_scale_for_memory=use_log_scale_for_memory,
+            plot_single_report_lines=plot_single_report_lines,
+            show_memory_std=show_memory_std,
+            apply_savgol_filter=apply_savgol_filter,
+            savgol_filter_window_size=savgol_filter_window_size,
+            aggregated_line_line_width=aggregated_line_line_width,
+        )
+
+    figure.tight_layout()
