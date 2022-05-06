@@ -48,8 +48,8 @@ def yformat_func(value, tick_number):
 
 def plot_reports(
     paths: Union[str, List[str]],
-    use_log_xscale: bool = True,
-    use_log_yscale: bool = True,
+    use_log_scale_for_time: bool = True,
+    use_log_scale_for_memory: bool = False,
     plot_single_report_lines: bool = True
 ):
     """Plot one or more reports from the provided path(s).
@@ -58,9 +58,9 @@ def plot_reports(
     ------------------------
     paths: Union[str, List[str]]
         Path(s) from where to load the reports
-    use_log_xscale: bool = True
+    use_log_scale_for_time: bool = True
         Whether to use log scale for the horizontal axis.
-    use_log_yscale: bool = True
+    use_log_scale_for_memory: bool = False
         Whether to use log scale for the vertical axis.
     plot_single_report_lines: bool = True
         Whether to plot the single report lines.
@@ -73,13 +73,13 @@ def plot_reports(
     axis.yaxis.set_major_formatter(plt.FuncFormatter(yformat_func))
 
     # Handle scales and the relative axis labels.
-    if use_log_xscale:
+    if use_log_scale_for_time:
         axis.set_xscale("log")
         axis.set_xlabel("Time (log scale)")
     else:
         axis.set_xlabel("Time")
 
-    if use_log_yscale:
+    if use_log_scale_for_memory:
         axis.set_yscale("log")
         axis.set_xlabel("Memory (log scale)")
     else:
