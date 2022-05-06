@@ -122,7 +122,7 @@ def plot_reports(
                 continue
 
             # Plot the current report line
-            axis.plot(*report.values.T, label=report_name, color=color)
+            axis.plot(*report.values.T, color=color)
 
             # Show the skulls
             if has_crashed_gracefully(path) or has_crashed_ungracefully(path):
@@ -177,6 +177,7 @@ def plot_reports(
             mean_memory,
             linewidth=2,
             color=color,
+            label=report_name,
         )
 
     fig.legend()
