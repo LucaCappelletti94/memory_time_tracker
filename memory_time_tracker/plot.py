@@ -28,19 +28,19 @@ def xformat_func(value, tick_number):
     if value == 0:
         return "0s"
     if value < 1e-9:
-        return r"${:.2f}ps$".format(value * 1e12)
+        return r"${:.1f}ps$".format(value * 1e12)
     if value < 1e-6:
-        return r"${:.2f}ns$".format(value * 1e9)
+        return r"${:.1f}ns$".format(value * 1e9)
     if value < 1e-3:
-        return r"${:.2f}\mu s$".format(value * 1e6)
+        return r"${:.1f}\mu s$".format(value * 1e6)
     if value < 1:
-        return r"${:.2f}ms$".format(value * 1e3)
+        return r"${:.1f}ms$".format(value * 1e3)
     if value < 60:
-        return r"${:.2f}s$".format(value)
+        return r"${:.1f}s$".format(value)
     if value < 3600:
-        return r"${:.2f}m$".format(value / 60)
+        return r"${:.1f}m$".format(value / 60)
 
-    return r"${:.2f}h$".format(value / 3600)
+    return r"${:.1f}h$".format(value / 3600)
 
 
 def yformat_func(value, tick_number):
