@@ -52,7 +52,8 @@ def remove_duplicated_legend_labels(
 def xformat_func(value, tick_number):
     """Return time value formatted in human readable."""
     if value == 0:
-        formatted_time = "0s"
+        formatted_time = "0"
+        unit = "s"
     elif value < 1e-9:
         formatted_time = "{:.1f}".format(value * 1e12)
         unit = "ps"
@@ -325,6 +326,7 @@ def _plot_reports(
             color=color,
             label=report_name,
         )
+
 
 def plot_reports(
     paths: Union[str, List[str]],
