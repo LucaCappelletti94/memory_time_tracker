@@ -6,6 +6,7 @@ import matplotlib.patheffects as PathEffects
 import humanize
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import LogLocator, NullFormatter
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from scipy.signal import savgol_filter
@@ -51,21 +52,35 @@ def remove_duplicated_legend_labels(
 def xformat_func(value, tick_number):
     """Return time value formatted in human readable."""
     if value == 0:
-        return "0s"
-    if value < 1e-9:
-        return r"${:.1f}ps$".format(value * 1e12)
-    if value < 1e-6:
-        return r"${:.1f}ns$".format(value * 1e9)
-    if value < 1e-3:
-        return r"${:.1f}\mu s$".format(value * 1e6)
-    if value < 1:
-        return r"${:.1f}ms$".format(value * 1e3)
-    if value < 60:
-        return r"${:.1f}s$".format(value)
-    if value < 3600:
-        return r"${:.1f}m$".format(value / 60)
+        formatted_time = "0s"
+    elif value < 1e-9:
+        formatted_time = "{:.1f}".format(value * 1e12)
+        unit = "ps"
+    elif value < 1e-6:
+        formatted_time = "{:.1f}".format(value * 1e9)
+        unit = "ns"
+    elif value < 1e-3:
+        formatted_time = "{:.1f}".format(value * 1e6)
+        unit = "\mu s"
+    elif value < 1:
+        formatted_time = "{:.1f}".format(value * 1e3)
+        unit = "ms"
+    elif value < 60:
+        formatted_time = "{:.1f}".format(value)
+        unit = "s"
+    elif value < 3600:
+        formatted_time = "{:.1f}".format(value / 60)
+        unit = "m"
+    else:
+        formatted_time = "{:.1f}".format(value / 3600)
+        unit = "h"
 
-    return r"${:.1f}h$".format(value / 3600)
+    formatted_time = formatted_time.replace(".0", "")
+
+    return r"${formatted_time}{unit}$".format(
+        formatted_time=formatted_time,
+        unit=unit
+    )
 
 
 def yformat_func(value, tick_number):
@@ -174,12 +189,20 @@ def _plot_reports(
     if use_log_scale_for_time:
         axis.set_xscale("log")
         axis.set_xlabel("Time (log scale)")
+        # Set the minor tick interval in log scale
+        axis.xaxis.set_minor_locator(
+            LogLocator(base=10.0, subs=[0.2, 0.4, 0.6, 0.8], numticks=100)
+        )
+        # Do not format minor ticks
+        axis.xaxis.set_minor_formatter(
+            NullFormatter()
+        )
     else:
         axis.set_xlabel("Time")
 
     if use_log_scale_for_memory:
         axis.set_yscale("log")
-        axis.set_xlabel("Memory (log scale)")
+        axis.set_ylabel("Memory (log scale)")
     else:
         axis.set_ylabel("Memory")
 
