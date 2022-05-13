@@ -1,5 +1,5 @@
 """Submodule with plotting methods."""
-from typing import List, Union
+from typing import List, Union, Dict
 import os
 from sanitize_ml_labels import sanitize_ml_labels
 import matplotlib.patheffects as PathEffects
@@ -135,7 +135,9 @@ def _plot_reports(
     show_memory_std: bool = False,
     apply_savgol_filter: bool = True,
     savgol_filter_window_size: int = 33,
-    aggregated_line_line_width: Union[int, str] = "auto"
+    aggregated_line_line_width: Union[int, str] = "auto",
+    custom_defaults: Dict[str, Union[List[str], str]] = None
+
 ):
     """Plot one or more reports from the provided path(s).
 
@@ -169,6 +171,8 @@ def _plot_reports(
         The linewidth to use to plot the aggregated line.
         By default, with the value "auto", with set it to 1
         when the single reports should not be shown and 2 otherwise.
+    custom_defaults: Dict[str, Union[List[str], str]] = None
+        List of custom defaults to be used for remapping.
     """
     if isinstance(paths, str):
         paths = [paths]
@@ -224,7 +228,8 @@ def _plot_reports(
     # We start to iterate on the groups
     for (basename, group), color in zip(grouped_paths, TABLEAU):
         report_name = sanitize_ml_labels(
-            ".".join(basename.split(".")[:-1])
+            ".".join(basename.split(".")[:-1]),
+            custom_defaults=custom_defaults
         )
         reports = []
         # We iterate over the report paths
