@@ -319,12 +319,16 @@ def _plot_reports(
                 alpha=0.1
             )
 
+        # We show on top the shortest line.
+        zorder = 2147483647 - aggregated_time.shape[0]
+
         axis.plot(
             aggregated_time,
             aggregated_memory,
             linewidth=aggregated_line_line_width,
             color=color,
             label=report_name,
+            zorder=zorder
         )
 
 
