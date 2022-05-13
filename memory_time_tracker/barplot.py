@@ -23,6 +23,34 @@ def load_report(path: str) -> pd.DataFrame:
     return report
 
 
+def get_aggregated_reports_dataframe(paths: Union[str, List[str]],) -> Tuple[List[Figure], List[Axes]]:
+    """Plot one or more reports from the provided path(s).
+
+    Parameters
+    ------------------------
+    paths: Union[str, List[str]]
+        Path(s) from where to load the reports.
+    """
+    if isinstance(paths, str):
+        paths = [paths]
+
+    # We start to iterate on the groups
+    return pd.DataFrame([
+        {
+            "basename": basename,
+            "memory": report.ram.max(),
+            "time": report.delta.max(),
+        }
+        for report, basename in (
+            (
+                load_report(path),
+                ".".join(os.path.basename(path).split(".")[:-1])
+            )
+            for path in paths
+        )
+    ])
+
+
 def plot_report_barplots(
     paths: Union[str, List[str]],
     **kwargs: Dict

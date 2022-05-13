@@ -3,7 +3,7 @@
 from .tracker import Tracker
 from .utils import has_crashed_gracefully, has_completed_successfully, has_crashed_ungracefully
 from .plot import plot_reports
-from .barplot import plot_report_barplots
+from .barplot import plot_report_barplots, get_aggregated_reports_dataframe
 
 __all__ = [
     "Tracker",
@@ -11,5 +11,6 @@ __all__ = [
     "has_completed_successfully",
     "has_crashed_ungracefully",
     "plot_reports",
-    "plot_report_barplots"
+    "plot_report_barplots",
+    "get_aggregated_reports_dataframe"
 ]
