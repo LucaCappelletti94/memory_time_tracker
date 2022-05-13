@@ -137,7 +137,6 @@ def _plot_reports(
     savgol_filter_window_size: int = 33,
     aggregated_line_line_width: Union[int, str] = "auto",
     custom_defaults: Dict[str, Union[List[str], str]] = None
-
 ):
     """Plot one or more reports from the provided path(s).
 
@@ -347,7 +346,8 @@ def plot_reports(
     apply_savgol_filter: bool = True,
     savgol_filter_window_size: int = 33,
     aggregated_line_line_width: Union[int, str] = "auto",
-    show_linear_and_log_scale: bool = True
+    show_linear_and_log_scale: bool = True,
+    custom_defaults: Dict[str, Union[List[str], str]] = None
 ):
     """Plot one or more reports from the provided path(s).
 
@@ -381,6 +381,8 @@ def plot_reports(
         Whether to make one plot with the parameters or two
         using both a linear and logaritmic scal
         for the horizontal (the time) axis
+    custom_defaults: Dict[str, Union[List[str], str]] = None
+        List of custom defaults to be used for remapping.
     """
 
     if show_linear_and_log_scale:
@@ -405,6 +407,7 @@ def plot_reports(
                 apply_savgol_filter=apply_savgol_filter,
                 savgol_filter_window_size=savgol_filter_window_size,
                 aggregated_line_line_width=aggregated_line_line_width,
+                custom_defaults=custom_defaults
             )
 
             remove_duplicated_legend_labels(
@@ -425,6 +428,7 @@ def plot_reports(
             apply_savgol_filter=apply_savgol_filter,
             savgol_filter_window_size=savgol_filter_window_size,
             aggregated_line_line_width=aggregated_line_line_width,
+            custom_defaults=custom_defaults
         )
 
         remove_duplicated_legend_labels(
