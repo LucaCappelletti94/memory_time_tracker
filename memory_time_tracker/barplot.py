@@ -1,6 +1,5 @@
 """Submodule with plotting methods."""
-from itertools import groupby
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Dict
 import os
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -26,9 +25,7 @@ def load_report(path: str) -> pd.DataFrame:
 
 def plot_report_barplots(
     paths: Union[str, List[str]],
-    log_scale: bool = True,
-    use_log_scale_for_memory: bool = False,
-    plot_single_report_lines: bool = True,
+    **kwargs: Dict
 ) -> Tuple[List[Figure], List[Axes]]:
     """Plot one or more reports from the provided path(s).
 
@@ -37,8 +34,8 @@ def plot_report_barplots(
     paths: Union[str, List[str]]
         Path(s) from where to load the reports.
         File with the same basename will be averaged out.
-    log_scale: bool = True
-        Whether to use log scale.
+    **kwargs: Dict
+        Parameters to forward to plots.
     """
     if isinstance(paths, str):
         paths = [paths]
@@ -59,4 +56,9 @@ def plot_report_barplots(
         )
     ])
 
-    return barplots(df, groupby=["basename"])
+    return barplots(
+        df,
+        groupby=["basename"],
+        use_multiprocessing=False,
+        **kwargs
+    )
