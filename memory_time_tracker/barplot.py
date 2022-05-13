@@ -23,7 +23,7 @@ def load_report(path: str) -> pd.DataFrame:
     return report
 
 
-def get_aggregated_reports_dataframe(paths: Union[str, List[str]],) -> Tuple[List[Figure], List[Axes]]:
+def get_aggregated_reports_dataframe(paths: Union[str, List[str]],) -> pd.DataFrame:
     """Plot one or more reports from the provided path(s).
 
     Parameters
