@@ -13,16 +13,16 @@ from scipy.signal import savgol_filter
 from .utils import has_completed_successfully, has_crashed_gracefully, has_crashed_ungracefully
 
 TABLEAU = [
-    "tab:blue",
-    "tab:orange",
-    "tab:green",
-    "tab:red",
-    "tab:purple",
-    "tab:brown",
-    "tab:pink",
-    "tab:gray",
-    "tab:olive",
-    "tab:cyan",
+    '#4e79a7',
+    '#f28e2b',
+    '#e15759',
+    '#76b7b2',
+    '#59a14e',
+    "#edc949",
+    "#b07aa2",
+    "#ff9da7",
+    "#9c755f",
+    "#bab0ac",
 ]
 
 
