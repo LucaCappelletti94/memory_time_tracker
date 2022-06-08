@@ -1,5 +1,5 @@
 """Submodule with plotting methods."""
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Tuple
 import os
 from sanitize_ml_labels import sanitize_ml_labels
 import matplotlib.patheffects as PathEffects
