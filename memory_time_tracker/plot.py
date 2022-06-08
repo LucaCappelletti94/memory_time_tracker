@@ -416,7 +416,7 @@ def plot_reports(
                 "best",
             )
     else:
-        figure, axis = plt.subplots(figsize=(1, 5), dpi=200)
+        figure, axis = plt.subplots(figsize=(5, 5), dpi=200)
         _plot_reports(
             figure,
             axis=axis,
