@@ -348,7 +348,7 @@ def plot_reports(
     aggregated_line_line_width: Union[int, str] = "auto",
     show_linear_and_log_scale: bool = True,
     custom_defaults: Dict[str, Union[List[str], str]] = None
-):
+) -> Tuple[Figure, Axes]:
     """Plot one or more reports from the provided path(s).
 
     Parameters
@@ -386,11 +386,12 @@ def plot_reports(
     """
 
     if show_linear_and_log_scale:
-        figure, (linear_axis, log_axis) = plt.subplots(
+        figure, axis = plt.subplots(
             ncols=2,
             figsize=(10, 5),
             dpi=200
         )
+        (linear_axis, log_axis) = axis
         for axis, scale in (
             (linear_axis, False),
             (log_axis, True),
@@ -437,3 +438,5 @@ def plot_reports(
         )
 
     figure.tight_layout()
+
+    return figure, axis
